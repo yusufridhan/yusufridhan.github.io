@@ -18,6 +18,7 @@
       --text-light: #eeeeee;
       --text-dark: #393e46;
       --border-color: #393e46;
+      --sidebar-width: 280px;
     }
 
     html, body {
@@ -33,7 +34,7 @@
     }
 
     .sidebar {
-      width: 280px;
+      width: var(--sidebar-width);
       flex-shrink: 0;
       background-color: var(--sidebar-bg);
       color: var(--text-light);
@@ -41,6 +42,8 @@
       flex-direction: column;
       padding: 20px;
       box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      z-index: 1001;
+      transition: transform 0.3s ease;
     }
 
     .sidebar-header {
@@ -87,6 +90,8 @@
       flex-grow: 1;
       position: relative;
     }
+    
+    .mobile-header { display: none; }
 
     .map-container {
       position: absolute;
@@ -140,17 +145,67 @@
     .insight-box ul { padding-left: 20px; margin: 5px 0 0 0; }
     .insight-box strong { color: #000; }
     
-    @media (max-width: 768px) {
-      body { flex-direction: column; }
-      .sidebar { width: 100%; height: auto; flex-shrink: 1; }
-      .main-content { height: 100%; }
-      .insight-box { max-width: calc(100% - 40px); }
+    /* Reposition insight box for the bivariate map to avoid legend overlap */
+    .insight-box.top-right {
+        bottom: auto;
+        left: auto;
+        top: 20px;
+        right: 20px;
+    }
+
+    /* --- Mobile Optimizations --- */
+    @media (max-width: 992px) {
+      body {
+        flex-direction: column;
+      }
+      .main-content {
+        height: 100%;
+      }
+      .sidebar {
+        position: absolute;
+        height: 100%;
+        transform: translateX(calc(-1 * var(--sidebar-width)));
+      }
+      .sidebar.is-open {
+        transform: translateX(0);
+      }
+      .mobile-header {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        background: var(--sidebar-bg);
+        color: var(--text-light);
+        flex-shrink: 0;
+      }
+      .menu-toggle {
+        background: none;
+        border: none;
+        color: var(--text-light);
+        font-size: 1.5rem;
+        margin-right: 15px;
+      }
+      .mobile-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+      .insight-box {
+        max-width: calc(100% - 40px);
+        font-size: 13px;
+        bottom: 15px;
+        left: 10px;
+      }
+       .insight-box.top-right {
+        bottom: auto;
+        left: auto;
+        top: 15px;
+        right: 10px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <i class="bi bi-bus-front"></i>
       <h4>Transjakarta Analysis</h4>
@@ -175,6 +230,11 @@
   </div>
 
   <div class="main-content">
+    <div class="mobile-header">
+      <button class="menu-toggle" id="menu-toggle"><i class="bi bi-list"></i></button>
+      <div class="mobile-title">Transjakarta Analysis</div>
+    </div>
+  
     <div id="container-density" class="map-container">
       <iframe class="map-frame" src="transjakarta_stop_density_map.html" title="Stop density"></iframe>
       <div class="insight-box">
@@ -216,7 +276,7 @@
 
     <div id="container-bivariate" class="map-container">
       <iframe class="map-frame" src="transjakarta_bivariate_gap_map_v2.html" title="Bivariate gap"></iframe>
-       <div class="insight-box">
+       <div class="insight-box top-right">
         <h5><i class="bi bi-info-circle-fill"></i>Bivariate Transit Gap Analysis</h5>
         <p>This capstone analysis compares transit service levels (proximity to stops) with population density to identify service gaps.</p>
         <p>The color scheme is key: <strong>Red</strong> indicates low service, while <strong>Blue</strong> indicates high service. <strong>Brightness</strong> corresponds to population density.</p>
@@ -234,7 +294,9 @@
       'bivariate': 'container-bivariate'
     };
 
-    let current = 'density'; // Default map on load
+    let current = 'density';
+    const sidebar = document.getElementById('sidebar');
+    const menuToggle = document.getElementById('menu-toggle');
 
     function showMap(name) {
       Object.keys(mapToContainer).forEach(k => {
@@ -253,7 +315,15 @@
       link.addEventListener('click', (e) => {
         e.preventDefault();
         showMap(link.dataset.map);
+        // Close sidebar on mobile after selection
+        if (window.innerWidth <= 992) {
+            sidebar.classList.remove('is-open');
+        }
       });
+    });
+    
+    menuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('is-open');
     });
 
     document.addEventListener('DOMContentLoaded', () => {
