@@ -5,137 +5,222 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Transjakarta GTFS Analysis</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
   <style>
-    html,body { height:100%; margin:0; }
-    body { display:flex; flex-direction:column; }
-
-    .topbar {
-      flex: 0 0 auto;
-      z-index: 9999;
-      background: #fff;
-      padding: 8px 12px;
-      border-bottom: 1px solid #ddd;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    :root {
+      --sidebar-bg: #232931;
+      --map-bg: #f4f7fa;
+      --accent-color: #4ecca3;
+      --text-light: #eeeeee;
+      --text-dark: #393e46;
+      --border-color: #393e46;
     }
 
-    .map-wrap {
-      flex: 1 1 auto;
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--map-bg);
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+    }
+
+    .sidebar {
+      width: 280px;
+      flex-shrink: 0;
+      background-color: var(--sidebar-bg);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar-header {
+      padding: 10px 0;
+      margin-bottom: 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .sidebar-header h4 {
+      margin: 0;
+      font-weight: 600;
+    }
+    .sidebar-header i {
+      font-size: 2rem;
+      color: var(--accent-color);
+      margin-bottom: 10px;
+    }
+
+    .nav-pills .nav-link {
+      color: var(--text-light);
+      margin-bottom: 8px;
+      border-radius: 8px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+    }
+    .nav-pills .nav-link i {
+      margin-right: 15px;
+      font-size: 1.2rem;
+      width: 20px;
+      text-align: center;
+    }
+    .nav-pills .nav-link:hover {
+      background-color: var(--border-color);
+    }
+    .nav-pills .nav-link.active {
+      background-color: var(--accent-color);
+      color: var(--sidebar-bg);
+      font-weight: 600;
+    }
+
+    .main-content {
+      flex-grow: 1;
       position: relative;
     }
 
     .map-container {
       position: absolute;
-      top:0; left:0; right:0; bottom:0;
-      width:100%;
-      height:100%;
-      display: none;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
     }
-    .map-container.active { display:block; }
+    .map-container.active {
+      opacity: 1;
+      visibility: visible;
+    }
 
     iframe.map-frame {
-      width:100%;
-      height:100%;
-      border:0;
+      width: 100%; height: 100%; border: 0;
     }
 
     .insight-box {
       position: absolute;
       bottom: 20px;
-      left: 10px;
+      left: 20px;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 15px;
-      max-width: 320px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      font-family: sans-serif;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 380px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
+      color: var(--text-dark);
     }
     .insight-box h5 {
-      font-size: 16px;
+      font-size: 18px;
+      font-weight: 600;
       margin-top: 0;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 8px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
     }
-    .insight-box p { margin-bottom: 0; }
-    .insight-box strong { color: #333; }
+     .insight-box h5 i {
+        margin-right: 10px;
+        color: var(--accent-color);
+     }
+    .insight-box p { margin-bottom: 10px; }
+    .insight-box ul { padding-left: 20px; margin: 5px 0 0 0; }
+    .insight-box strong { color: #000; }
+    
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; flex-shrink: 1; }
+      .main-content { height: 100%; }
+      .insight-box { max-width: calc(100% - 40px); }
+    }
   </style>
 </head>
 <body>
 
-  <nav class="topbar navbar navbar-expand-md navbar-light">
-    <div class="container-fluid">
-      <a class="navbar-brand fw-semibold" href="#">🚌 Transjakarta GTFS Analysis</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mapNav" aria-controls="mapNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="mapNav">
-        <ul class="navbar-nav me-auto mb-2 mb-md-0">
-          <li class="nav-item"><a class="nav-link map-link" data-map="density" href="#">Stop Density</a></li>
-          <li class="nav-item"><a class="nav-link map-link" data-map="route" href="#">Route Speed</a></li>
-          <li class="nav-item"><a class="nav-link map-link" data-map="communities" href="#">Communities Analysis</a></li>
-          <li class="nav-item"><a class="nav-link map-link" data-map="centrality" href="#">Centrality Analysis</a></li>
-          <li class="nav-item"><a class="nav-link map-link" data-map="bivariate" href="#">Bivariate Gap Analysis</a></li>
-        </ul>
-        <form class="d-flex">
-          <select id="mapSelect" class="form-select form-select-sm">
-            <option value="density">Stop Density Analysis</option>
-            <option value="route">Route Speed</option>
-            <option value="communities">Communities Analysis</option>
-            <option value="centrality">Centrality Analysis</option>
-            <option value="bivariate">Gap Analysis</option>
-          </select>
-        </form>
-      </div>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <i class="bi bi-bus-front"></i>
+      <h4>Transjakarta Analysis</h4>
     </div>
-  </nav>
+    <ul class="nav nav-pills flex-column">
+      <li class="nav-item">
+        <a class="nav-link map-link" data-map="density" href="#"><i class="bi bi-bullseye"></i>Stop Density</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link map-link" data-map="route" href="#"><i class="bi bi-speedometer2"></i>Route Speed</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link map-link" data-map="communities" href="#"><i class="bi bi-diagram-3"></i>Communities Analysis</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link map-link" data-map="centrality" href="#"><i class="bi bi-hub"></i>Centrality Analysis</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link map-link" data-map="bivariate" href="#"><i class="bi bi-map"></i>Bivariate Gap Analysis</a>
+      </li>
+    </ul>
+  </div>
 
-  <div class="map-wrap">
+  <div class="main-content">
     <div id="container-density" class="map-container">
       <iframe class="map-frame" src="transjakarta_stop_density_map.html" title="Stop density"></iframe>
       <div class="insight-box">
-        <h5>Stop Density Analysis</h5>
-        <p>This heatmap visualizes the concentration of Transjakarta stops. Brighter areas indicate a higher density of stops, highlighting zones with greater transit accessibility.</p>
+        <h5><i class="bi bi-info-circle-fill"></i>Stop Density Analysis</h5>
+        <p>This foundational heatmap visualizes the concentration of Transjakarta stops. Brighter, "hotter" areas indicate a higher density of stops, which generally corresponds to zones with greater transit accessibility and service availability.</p>
       </div>
     </div>
 
     <div id="container-route" class="map-container">
       <iframe class="map-frame" src="transjakarta_route_speed_map.html" title="Route speed"></iframe>
       <div class="insight-box">
-        <h5>Route Speed Analysis</h5>
-        <p>This map displays the average speed of different bus routes. The color scale helps identify faster (red) and slower (yellow) routes, pointing to potential traffic congestion or operational efficiencies.</p>
+        <h5><i class="bi bi-info-circle-fill"></i>Route Speed Analysis</h5>
+        <p>This map displays the average operational speed of different bus routes. The color scale (<strong>Yellow = Slower, Red = Faster</strong>) helps quickly identify routes that may be impacted by traffic congestion versus those that operate more efficiently.</p>
       </div>
     </div>
 
     <div id="container-communities" class="map-container">
       <iframe class="map-frame" src="transjakarta_communities_map.html" title="Communities"></iframe>
        <div class="insight-box">
-        <h5>Network Communities Analysis</h5>
-        <p>Using the Louvain algorithm, this analysis identifies distinct clusters (communities) of closely connected stops. Each color represents a different community, revealing the underlying structure of the transit network and highlighting routes that act as "bridges" between them.</p>
+        <h5><i class="bi bi-info-circle-fill"></i>Network Communities Analysis</h5>
+        <p>This analysis reveals the underlying structure of the network by identifying distinct clusters (or "communities") of closely connected stops. The algorithm found <strong>752 communities</strong>, visualized by different colors.</p>
+        <p>It also identifies critical <strong>"bridge routes"</strong> that connect these communities. Top examples include:</p>
+        <ul>
+            <li>Route 3: Kalideres - Monas</li>
+            <li>JAK.108: Kramat Jati - Bambu Apus</li>
+        </ul>
       </div>
     </div>
 
     <div id="container-centrality" class="map-container">
       <iframe class="map-frame" src="transjakarta_enhanced_centrality_map.html" title="Enhanced centrality"></iframe>
       <div class="insight-box">
-        <h5>Network Centrality Analysis</h5>
-        <p>This map identifies the most important stops in the network.<br>
-        <strong>Bridges (Blue):</strong> Stops crucial for connecting different parts of the network.<br>
-        <strong>Hubs (Orange):</strong> Stops with the most direct connections to other stops.</p>
+        <h5><i class="bi bi-info-circle-fill"></i>Network Centrality Analysis</h5>
+        <p>This map identifies the most important and influential stops in the network based on their position and connections.</p>
+        <p><strong>Bridges (Blue):</strong> Stops crucial for connecting different parts of the network. Top bridges include <strong>Potlot</strong> and <strong>Simpang Danau Sunter Selatan</strong>.</p>
+        <p><strong>Hubs (Orange):</strong> Stops with the most direct connections. Key hubs are <strong>Jln. Taman Jatibaru Timur</strong> and <strong>Cibubur Junction</strong>.</p>
       </div>
     </div>
 
     <div id="container-bivariate" class="map-container">
       <iframe class="map-frame" src="transjakarta_bivariate_gap_map_v2.html" title="Bivariate gap"></iframe>
        <div class="insight-box">
-        <h5>Bivariate Gap Analysis</h5>
-        <p>This map compares transit service levels with population density. The color scheme is intuitive: Red indicates low service, while Blue indicates high service. Brightness corresponds to population density. <strong>Bright red areas are critical service gaps</strong>—high population with poor transit access.</p>
+        <h5><i class="bi bi-info-circle-fill"></i>Bivariate Transit Gap Analysis</h5>
+        <p>This capstone analysis compares transit service levels (proximity to stops) with population density to identify service gaps.</p>
+        <p>The color scheme is key: <strong>Red</strong> indicates low service, while <strong>Blue</strong> indicates high service. <strong>Brightness</strong> corresponds to population density.</p>
+        <p>Look for <strong>bright red areas</strong>. These are critical service gaps—zones with high population but poor transit access, which could be prioritized for future network expansion.</p>
       </div>
     </div>
   </div>
@@ -149,7 +234,7 @@
       'bivariate': 'container-bivariate'
     };
 
-    let current = 'density';
+    let current = 'density'; // Default map on load
 
     function showMap(name) {
       Object.keys(mapToContainer).forEach(k => {
@@ -157,7 +242,7 @@
         if (!el) return;
         el.classList.toggle('active', k === name);
       });
-      document.getElementById('mapSelect').value = name;
+      
       document.querySelectorAll('.map-link').forEach(link => {
         link.classList.toggle('active', link.dataset.map === name);
       });
@@ -171,15 +256,10 @@
       });
     });
 
-    document.getElementById('mapSelect').addEventListener('change', function(){
-      showMap(this.value);
-    });
-
     document.addEventListener('DOMContentLoaded', () => {
       showMap(current);
     });
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
