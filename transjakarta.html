@@ -79,24 +79,49 @@
       background: rgba(255, 255, 255, 0.75);
       backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px; padding: 20px;
+      border-radius: 10px; padding: 15px 20px;
       width: 380px; max-width: calc(100% - 40px);
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       color: var(--text-dark);
+      overflow: hidden;
+    }
+    .insight-box__header {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+     .insight-box__header i { margin-right: 12px; color: var(--accent-color); }
+     .insight-box__toggle-icon { margin-left: auto; transition: transform 0.3s ease; }
+
+    .insight-box__content {
+      padding-top: 12px;
+      margin-top: 12px;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      font-size: 14px;
       line-height: 1.6;
+      transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out, margin-top 0.4s ease, padding-top 0.4s ease;
+      max-height: 500px;
+      opacity: 1;
     }
-    .insight-box h5 {
-      font-size: 18px; font-weight: 600;
-      margin: 0 0 12px 0; padding-bottom: 10px;
-      border-bottom: 1px solid rgba(0,0,0,0.1);
-      display: flex; align-items: center;
-    }
-    .insight-box h5 i { margin-right: 12px; color: var(--accent-color); }
-    .insight-box p { margin-bottom: 10px; font-size: 14px;}
+    .insight-box p { margin-bottom: 10px; }
     .insight-box ul { padding-left: 20px; margin: 5px 0 0 0; }
+    .insight-box strong { color: #000; }
+    
+    .insight-box.is-collapsed .insight-box__content {
+        max-height: 0;
+        opacity: 0;
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+    }
+    .insight-box.is-collapsed .insight-box__toggle-icon {
+        transform: rotate(-90deg);
+    }
+
     .insight-box.top-right { bottom: auto; left: auto; top: 20px; right: 20px; }
-    .insight-close-btn { display: none; }
-    .insight-fab { display: none; }
     
     .sidebar-overlay {
         display: none;
@@ -137,30 +162,14 @@
       }
       
       .insight-box {
-        display: none; 
-        position: fixed; bottom: 0; left: 0; right: 0;
-        width: 100%; max-width: 100%;
-        border-radius: 20px 20px 0 0;
-        transform: translateY(100%);
-        transition: transform 0.3s ease-in-out;
+        bottom: 15px;
+        left: 10px;
+        right: 10px;
+        width: auto;
       }
-      .insight-box.is-visible { display: block; transform: translateY(0); }
-      .insight-box.top-right { top: auto; right: 0; }
-      .insight-close-btn {
-        display: block; position: absolute; top: 15px; right: 15px;
-        background: #e0e0e0; border: none; border-radius: 50%;
-        width: 30px; height: 30px; font-size: 16px;
-        line-height: 1; cursor: pointer;
-      }
-
-      .insight-fab {
-        display: block; position: fixed;
-        bottom: 20px; right: 20px; z-index: 999;
-        width: 56px; height: 56px; border-radius: 50%;
-        background-color: var(--sidebar-bg); color: var(--text-light);
-        border: none; font-size: 1.8rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-        cursor: pointer;
+      .insight-box.top-right {
+        bottom: auto;
+        top: 15px;
       }
     }
   </style>
@@ -187,51 +196,51 @@
     <div id="container-density" class="map-container">
       <iframe class="map-frame" src="transjakarta_stop_density_map.html" title="Stop density"></iframe>
       <div class="insight-box">
-        <button class="insight-close-btn">&times;</button>
-        <h5><i class="bi bi-info-circle-fill"></i>Stop Density Analysis</h5>
-        <p>This heatmap shows stop concentrations. Brighter areas mean higher stop density and better transit access.</p>
+        <h5 class="insight-box__header"><i class="bi bi-info-circle-fill"></i>Stop Density Analysis<i class="bi bi-chevron-down insight-box__toggle-icon"></i></h5>
+        <div class="insight-box__content">
+          <p>This heatmap shows stop concentrations. Brighter areas mean higher stop density and better transit access.</p>
+        </div>
       </div>
-      <button class="insight-fab"><i class="bi bi-info-lg"></i></button>
     </div>
 
     <div id="container-route" class="map-container">
       <iframe class="map-frame" src="transjakarta_route_speed_map.html" title="Route speed"></iframe>
       <div class="insight-box">
-        <button class="insight-close-btn">&times;</button>
-        <h5><i class="bi bi-info-circle-fill"></i>Route Speed Analysis</h5>
-        <p>Displays average route speeds. <strong>Yellow = Slower, Red = Faster</strong>. This helps identify traffic congestion points.</p>
+        <h5 class="insight-box__header"><i class="bi bi-info-circle-fill"></i>Route Speed Analysis<i class="bi bi-chevron-down insight-box__toggle-icon"></i></h5>
+        <div class="insight-box__content">
+          <p>Displays average route speeds. <strong>Yellow = Slower, Red = Faster</strong>. This helps identify traffic congestion points.</p>
+        </div>
       </div>
-      <button class="insight-fab"><i class="bi bi-info-lg"></i></button>
     </div>
 
     <div id="container-communities" class="map-container">
       <iframe class="map-frame" src="transjakarta_communities_map.html" title="Communities"></iframe>
       <div class="insight-box">
-        <button class="insight-close-btn">&times;</button>
-        <h5><i class="bi bi-info-circle-fill"></i>Network Communities Analysis</h5>
-        <p>Reveals the network's structure by identifying <strong>752 distinct clusters</strong> (communities) of connected stops. It also highlights "bridge routes" that link these communities, like Route 3 (Kalideres - Monas).</p>
+        <h5 class="insight-box__header"><i class="bi bi-info-circle-fill"></i>Network Communities Analysis<i class="bi bi-chevron-down insight-box__toggle-icon"></i></h5>
+        <div class="insight-box__content">
+          <p>Reveals the network's structure by identifying <strong>752 distinct clusters</strong> (communities) of connected stops. It also highlights "bridge routes" that link these communities, like Route 3 (Kalideres - Monas).</p>
+        </div>
       </div>
-      <button class="insight-fab"><i class="bi bi-info-lg"></i></button>
     </div>
 
     <div id="container-centrality" class="map-container">
       <iframe class="map-frame" src="transjakarta_enhanced_centrality_map.html" title="Enhanced centrality"></iframe>
       <div class="insight-box">
-        <button class="insight-close-btn">&times;</button>
-        <h5><i class="bi bi-info-circle-fill"></i>Network Centrality Analysis</h5>
-        <p>Identifies influential stops. <strong>Bridges (Blue)</strong>, like <strong>Potlot</strong>, connect network parts. <strong>Hubs (Orange)</strong>, like <strong>Cibubur Junction</strong>, have the most direct connections.</p>
+        <h5 class="insight-box__header"><i class="bi bi-info-circle-fill"></i>Network Centrality Analysis<i class="bi bi-chevron-down insight-box__toggle-icon"></i></h5>
+        <div class="insight-box__content">
+          <p>Identifies influential stops. <strong>Bridges (Blue)</strong>, like <strong>Potlot</strong>, connect network parts. <strong>Hubs (Orange)</strong>, like <strong>Cibubur Junction</strong>, have the most direct connections.</p>
+        </div>
       </div>
-      <button class="insight-fab"><i class="bi bi-info-lg"></i></button>
     </div>
 
     <div id="container-bivariate" class="map-container">
       <iframe class="map-frame" src="transjakarta_bivariate_gap_map_v2.html" title="Bivariate gap"></iframe>
       <div class="insight-box top-right">
-        <button class="insight-close-btn">&times;</button>
-        <h5><i class="bi bi-info-circle-fill"></i>Bivariate Transit Gap Analysis</h5>
-        <p>This compares service with population. <strong>Red = Low Service, Blue = High Service</strong>. Brightness shows population. <strong>Bright red areas are critical service gaps</strong> (high population, poor transit) for prioritization.</p>
+        <h5 class="insight-box__header"><i class="bi bi-info-circle-fill"></i>Bivariate Transit Gap Analysis<i class="bi bi-chevron-down insight-box__toggle-icon"></i></h5>
+        <div class="insight-box__content">
+          <p>This compares service with population. <strong>Red = Low Service, Blue = High Service</strong>. Brightness shows population. <strong>Bright red areas are critical service gaps</strong> (high population, poor transit) for prioritization.</p>
+        </div>
       </div>
-      <button class="insight-fab"><i class="bi bi-info-lg"></i></button>
     </div>
   </main>
   
@@ -254,8 +263,6 @@
     const isMobile = () => window.innerWidth <= 992;
 
     function showMap(name, linkElement) {
-      document.querySelectorAll('.insight-box.is-visible').forEach(b => b.classList.remove('is-visible'));
-
       Object.keys(mapToContainer).forEach(k => {
         document.getElementById(mapToContainer[k]).classList.toggle('active', k === name);
       });
@@ -267,6 +274,15 @@
         mobileTitle.textContent = linkElement.dataset.title || 'Analysis';
       }
       current = name;
+      
+      // On mobile, ensure the newly shown insight box is collapsed
+      if (isMobile()) {
+        const activeContainer = document.getElementById(mapToContainer[name]);
+        const activeInsightBox = activeContainer.querySelector('.insight-box');
+        if (activeInsightBox) {
+            activeInsightBox.classList.add('is-collapsed');
+        }
+      }
     }
 
     // --- Event Listeners ---
@@ -291,16 +307,9 @@
         sidebarOverlay.classList.remove('is-active');
     });
 
-    document.querySelectorAll('.insight-fab').forEach(fab => {
-        fab.addEventListener('click', () => {
-            const insightBox = fab.previousElementSibling;
-            if (insightBox) insightBox.classList.add('is-visible');
-        });
-    });
-
-    document.querySelectorAll('.insight-close-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            btn.parentElement.classList.remove('is-visible');
+    document.querySelectorAll('.insight-box__header').forEach(header => {
+        header.addEventListener('click', () => {
+            header.parentElement.classList.toggle('is-collapsed');
         });
     });
 
@@ -308,6 +317,13 @@
     document.addEventListener('DOMContentLoaded', () => {
       const activeLink = document.querySelector(`.map-link[data-map="${current}"]`);
       showMap(current, activeLink);
+
+      // Collapse all insight boxes on initial load if mobile
+      if (isMobile()) {
+        document.querySelectorAll('.insight-box').forEach(box => {
+            box.classList.add('is-collapsed');
+        });
+      }
     });
   </script>
 
