@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Analisis GTFS Transjakarta</title>
+  <title>Transjakarta GTFS Analysis</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,150 +21,120 @@
       --text-active: #232931;
     }
     html, body {
-      height: 100%;
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background-color: #f0f2f5;
-      overflow: hidden; /* Mencegah scroll pada body */
+      height: 100%; margin: 0; font-family: 'Poppins', sans-serif;
+      background-color: #f0f2f5; overflow: hidden;
     }
-    body {
-      display: flex;
-      flex-direction: column;
-    }
+    body { display: flex; flex-direction: column; }
 
     /* === 1. HEADER (NAVIGASI ATAS) === */
     header {
-      background-color: var(--header-bg);
-      padding: 10px 20px;
-      color: var(--text-light);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap; /* Agar responsif di layar kecil */
-      gap: 10px;
-      flex-shrink: 0;
+      background-color: var(--header-bg); padding: 10px 20px;
+      color: var(--text-light); display: flex;
+      justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 10px; flex-shrink: 0;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
-    header h1 {
-      font-size: 1.2rem;
-      margin: 0;
-    }
+    header h1 { font-size: 1.2rem; margin: 0; }
     nav a {
-      color: var(--text-light);
-      text-decoration: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      transition: background-color 0.2s ease;
+      color: var(--text-light); text-decoration: none;
+      padding: 8px 12px; border-radius: 6px;
+      font-size: 0.9rem; transition: background-color 0.2s ease;
+      white-space: nowrap; /* Mencegah teks tombol patah ke baris baru */
     }
-    nav a:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
+    nav a:hover { background-color: rgba(255, 255, 255, 0.1); }
     nav a.active {
       background-color: var(--bg-active);
-      color: var(--text-active);
-      font-weight: 600;
+      color: var(--text-active); font-weight: 600;
     }
 
     /* === 2. KONTEN UTAMA (PETA) === */
-    main {
-      flex-grow: 1; /* Mengisi sisa ruang */
-      position: relative;
-    }
+    main { flex-grow: 1; position: relative; }
     .map-container {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease;
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
     }
-    .map-container.active {
-      opacity: 1;
-      visibility: visible;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+    .map-container.active { opacity: 1; visibility: visible; }
+    iframe { width: 100%; height: 100%; border: none; }
 
     /* === 3. INSIGHT BAR (PANEL INFO BAWAH) === */
     .insight-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: var(--insight-bg);
-      color: var(--text-dark);
-      padding: 15px 20px;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-      z-index: 1000;
-      /* Batasi tinggi agar tidak menutupi peta */
-      max-height: 25vh; 
-      overflow-y: auto; /* Bisa di-scroll jika konten panjang */
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background-color: var(--insight-bg); color: var(--text-dark);
+      padding: 15px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 1000; max-height: 25vh; overflow-y: auto;
     }
     .insight-content {
-      display: none; /* Sembunyikan semua deskripsi */
-      font-size: 0.85rem; /* Ukuran teks lebih kecil */
-      line-height: 1.5;
+      display: none; font-size: 0.85rem; line-height: 1.5;
     }
-    .insight-content.active {
-      display: block; /* Tampilkan deskripsi yang aktif */
-    }
-    .insight-content p {
-      margin: 0 0 5px 0;
-    }
-    .insight-content strong {
-      color: #000;
+    .insight-content.active { display: block; }
+    .insight-content p { margin: 0 0 5px 0; }
+    .insight-content strong { color: #000; }
+    
+    /* === [BARU] Tampilan Mobile yang Lebih Rapi === */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column; /* Susun judul dan navigasi secara vertikal */
+        align-items: center; /* Pusatkan item di header */
+        padding: 15px;
+      }
+      header h1 {
+        margin-bottom: 10px; /* Beri jarak antara judul dan tombol */
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap; /* Tombol akan pindah baris jika tidak muat */
+        justify-content: center; /* Pusatkan tombol-tombol */
+        gap: 5px;
+      }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Analisis Transjakarta</h1>
+    <h1>Transjakarta Analysis</h1>
     <nav id="nav-links">
-      <a href="#" class="nav-link" data-map="density">Kepadatan Halte</a>
-      <a href="#" class="nav-link" data-map="route">Kecepatan Rute</a>
-      <a href="#" class="nav-link" data-map="communities">Komunitas</a>
-      <a href="#" class="nav-link" data-map="centrality">Sentralitas</a>
-      <a href="#" class="nav-link" data-map="bivariate">Analisis Gap</a>
+      <a href="#" class="nav-link" data-map="density">Stop Density</a>
+      <a href="#" class="nav-link" data-map="route">Route Speed</a>
+      <a href="#" class="nav-link" data-map="communities">Communities</a>
+      <a href="#" class="nav-link" data-map="centrality">Centrality</a>
+      <a href="#" class="nav-link" data-map="bivariate">Gap Analysis</a>
     </nav>
   </header>
 
   <main>
     <div id="container-density" class="map-container">
-      <iframe src="transjakarta_stop_density_map.html" title="Kepadatan Halte"></iframe>
+      <iframe src="transjakarta_stop_density_map.html" title="Stop Density"></iframe>
     </div>
     <div id="container-route" class="map-container">
-      <iframe src="transjakarta_route_speed_map.html" title="Kecepatan Rute"></iframe>
+      <iframe src="transjakarta_route_speed_map.html" title="Route Speed"></iframe>
     </div>
     <div id="container-communities" class="map-container">
-      <iframe src="transjakarta_communities_map.html" title="Komunitas"></iframe>
+      <iframe src="transjakarta_communities_map.html" title="Communities"></iframe>
     </div>
     <div id="container-centrality" class="map-container">
-      <iframe src="transjakarta_enhanced_centrality_map.html" title="Sentralitas"></iframe>
+      <iframe src="transjakarta_enhanced_centrality_map.html" title="Centrality"></iframe>
     </div>
     <div id="container-bivariate" class="map-container">
-      <iframe src="transjakarta_bivariate_gap_map_v2.html" title="Analisis Gap"></iframe>
+      <iframe src="transjakarta_bivariate_gap_map_v2.html" title="Bivariate Gap Analysis"></iframe>
     </div>
   </main>
 
   <div class="insight-bar">
     <div class="insight-content" data-map="density">
-      <p><strong>Analisis Kepadatan Halte:</strong> Peta panas ini menunjukkan konsentrasi halte bus. Area yang lebih terang berarti kepadatan halte lebih tinggi dan akses transit lebih baik.</p>
+      <p><strong>Stop Density Analysis:</strong> This heatmap shows stop concentrations. Brighter areas mean higher stop density and better transit access.</p>
     </div>
     <div class="insight-content" data-map="route">
-      <p><strong>Analisis Kecepatan Rute:</strong> Menampilkan kecepatan rata-rata rute. <strong>Kuning = Lambat, Merah = Cepat</strong>. Ini membantu mengidentifikasi titik kemacetan lalu lintas.</p>
+      <p><strong>Route Speed Analysis:</strong> Displays average route speeds. <strong>Yellow = Slower, Red = Faster</strong>. This helps identify traffic congestion points.</p>
     </div>
     <div class="insight-content" data-map="communities">
-      <p><strong>Analisis Komunitas Jaringan:</strong> Mengungkapkan struktur jaringan dengan mengidentifikasi <strong>752 klaster</strong> (komunitas) halte yang terhubung. Juga menyoroti "rute jembatan" yang menghubungkan komunitas ini, seperti Rute 3 (Kalideres - Monas).</p>
+      <p><strong>Network Communities Analysis:</strong> Reveals the network's structure by identifying <strong>752 distinct clusters</strong> (communities) of connected stops. It also highlights "bridge routes" that link these communities, like Route 3 (Kalideres - Monas).</p>
     </div>
     <div class="insight-content" data-map="centrality">
-      <p><strong>Analisis Sentralitas Jaringan:</strong> Mengidentifikasi halte yang berpengaruh. <strong>Jembatan (Biru)</strong>, seperti <strong>Simpang Danau Sunter Selatan</strong>, menghubungkan bagian-bagian jaringan. <strong>Hub (Oranye)</strong>, seperti <strong>Cibubur Junction</strong>, memiliki koneksi langsung terbanyak.</p>
+      <p><strong>Network Centrality Analysis:</strong> Identifies influential stops. <strong>Bridges (Blue)</strong>, like <strong>Simpang Danau Sunter Selatan</strong>, connect network parts. <strong>Hubs (Orange)</strong>, like <strong>Cibubur Junction</strong>, have the most direct connections.</p>
     </div>
     <div class="insight-content" data-map="bivariate">
-      <p><strong>Analisis Kesenjangan Transit Bivariat:</strong> Membandingkan layanan dengan populasi. <strong>Merah = Layanan Rendah, Biru = Layanan Tinggi</strong>. Kecerahan menunjukkan kepadatan populasi. <strong>Area merah terang adalah kesenjangan layanan kritis</strong> (populasi tinggi, transit buruk) yang perlu diprioritaskan.</p>
+      <p><strong>Bivariate Transit Gap Analysis:</strong> This compares service with population. <strong>Red = Low Service, Blue = High Service</strong>. Brightness shows population. <strong>Bright red areas are critical service gaps</strong> (high population, poor transit) for prioritization.</p>
     </div>
   </div>
 
@@ -175,12 +145,10 @@
       const insightContents = document.querySelectorAll('.insight-content');
 
       function switchView(mapName) {
-        // Hapus kelas 'active' dari semua elemen
         navLinks.forEach(link => link.classList.remove('active'));
         mapContainers.forEach(container => container.classList.remove('active'));
         insightContents.forEach(content => content.classList.remove('active'));
 
-        // Temukan dan aktifkan elemen yang sesuai
         const activeLink = document.querySelector(`.nav-link[data-map="${mapName}"]`);
         const activeMapContainer = document.getElementById(`container-${mapName}`);
         const activeInsightContent = document.querySelector(`.insight-content[data-map="${mapName}"]`);
@@ -190,16 +158,14 @@
         if (activeInsightContent) activeInsightContent.classList.add('active');
       }
 
-      // Tambahkan event listener untuk setiap link navigasi
       navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
-          e.preventDefault(); // Mencegah link berpindah halaman
+          e.preventDefault();
           const mapName = link.getAttribute('data-map');
           switchView(mapName);
         });
       });
 
-      // Tampilkan tampilan awal saat halaman dimuat
       switchView('density'); 
     });
   </script>
