@@ -31,21 +31,30 @@
       background-color: var(--header-bg); padding: 10px 20px;
       color: var(--text-light); display: flex;
       justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 10px; flex-shrink: 0;
+      flex-shrink: 0;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      position: relative; /* Diperlukan untuk menu dropdown */
+      z-index: 1001; /* Pastikan header di atas peta */
     }
     header h1 { font-size: 1.2rem; margin: 0; }
-    nav a {
+    .nav-links {
+      display: flex;
+      gap: 5px;
+    }
+    .nav-links a {
       color: var(--text-light); text-decoration: none;
       padding: 8px 12px; border-radius: 6px;
       font-size: 0.9rem; transition: background-color 0.2s ease;
-      white-space: nowrap; /* Mencegah teks tombol patah ke baris baru */
+      white-space: nowrap;
     }
-    nav a:hover { background-color: rgba(255, 255, 255, 0.1); }
-    nav a.active {
+    .nav-links a:hover { background-color: rgba(255, 255, 255, 0.1); }
+    .nav-links a.active {
       background-color: var(--bg-active);
       color: var(--text-active); font-weight: 600;
     }
+
+    /* Tombol Menu Hamburger (disembunyikan di desktop) */
+    .menu-toggle { display: none; }
 
     /* === 2. KONTEN UTAMA (PETA) === */
     main { flex-grow: 1; position: relative; }
@@ -70,21 +79,45 @@
     .insight-content p { margin: 0 0 5px 0; }
     .insight-content strong { color: #000; }
     
-    /* === [BARU] Tampilan Mobile yang Lebih Rapi === */
+    /* === Tampilan Mobile dengan Menu Collapsible === */
     @media (max-width: 768px) {
-      header {
-        flex-direction: column; /* Susun judul dan navigasi secara vertikal */
-        align-items: center; /* Pusatkan item di header */
-        padding: 15px;
-      }
-      header h1 {
-        margin-bottom: 10px; /* Beri jarak antara judul dan tombol */
-      }
-      nav {
-        display: flex;
-        flex-wrap: wrap; /* Tombol akan pindah baris jika tidak muat */
-        justify-content: center; /* Pusatkan tombol-tombol */
+      /* Tampilkan tombol hamburger */
+      .menu-toggle {
+        display: block;
+        background: none; border: none;
+        cursor: pointer; padding: 5px;
+        /* Styling untuk 3 garis hamburger */
+        display: flex; flex-direction: column;
         gap: 5px;
+      }
+      .menu-toggle span {
+        display: block;
+        width: 25px; height: 3px;
+        background-color: var(--text-light);
+        border-radius: 3px;
+      }
+
+      /* Sembunyikan navigasi link secara default */
+      .nav-links {
+        display: none;
+      }
+      
+      /* Styling untuk menu saat terbuka */
+      .nav-links.is-open {
+        display: flex;
+        flex-direction: column; /* Susun link secara vertikal */
+        gap: 10px;
+        position: absolute;
+        top: 100%; /* Muncul tepat di bawah header */
+        left: 0;
+        right: 0;
+        background-color: var(--header-bg);
+        padding: 15px;
+        box-shadow: 0 4px 5px rgba(0,0,0,0.2);
+      }
+      .nav-links.is-open a {
+        width: 100%;
+        text-align: center;
       }
     }
   </style>
@@ -93,7 +126,12 @@
 
   <header>
     <h1>Transjakarta Analysis</h1>
-    <nav id="nav-links">
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav class="nav-links" id="nav-menu">
       <a href="#" class="nav-link" data-map="density">Stop Density</a>
       <a href="#" class="nav-link" data-map="route">Route Speed</a>
       <a href="#" class="nav-link" data-map="communities">Communities</a>
@@ -143,7 +181,11 @@
       const navLinks = document.querySelectorAll('.nav-link');
       const mapContainers = document.querySelectorAll('.map-container');
       const insightContents = document.querySelectorAll('.insight-content');
+      const menuToggle = document.getElementById('menu-toggle');
+      const navMenu = document.getElementById('nav-menu');
+      const isMobile = () => window.innerWidth <= 768;
 
+      // Fungsi untuk ganti tampilan peta dan info
       function switchView(mapName) {
         navLinks.forEach(link => link.classList.remove('active'));
         mapContainers.forEach(container => container.classList.remove('active'));
@@ -158,14 +200,26 @@
         if (activeInsightContent) activeInsightContent.classList.add('active');
       }
 
+      // Event listener untuk tombol hamburger
+      menuToggle.addEventListener('click', () => {
+        navMenu.classList.toggle('is-open');
+      });
+
+      // Event listener untuk setiap link navigasi
       navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
           e.preventDefault();
           const mapName = link.getAttribute('data-map');
           switchView(mapName);
+          
+          // Tutup menu setelah link diklik di mobile
+          if (isMobile() && navMenu.classList.contains('is-open')) {
+            navMenu.classList.remove('is-open');
+          }
         });
       });
 
+      // Tampilan awal
       switchView('density'); 
     });
   </script>
