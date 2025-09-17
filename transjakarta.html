@@ -1,11 +1,13 @@
 <!doctype html>
+
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Transjakarta Maps — Switcher</title>
+  <title>Transjakarta GTFS Analysis</title>
 
   <!-- Bootstrap for responsive UI -->
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
@@ -35,62 +37,111 @@
       display: none;
     }
     iframe.map-frame.active { display:block; }
+
+    .insight-card { display:none; }
+    .insight-card.active { display:block; }
   </style>
+
 </head>
 <body>
 
   <nav class="topbar navbar navbar-expand-md navbar-light">
     <div class="container-fluid">
-      <a class="navbar-brand fw-semibold" href="#">🚌 Transjakarta Maps</a>
+      <a class="navbar-brand fw-semibold" href="#">🚌 Transjakarta GTFS Analysis</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mapNav" aria-controls="mapNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="mapNav">
-        <ul class="navbar-nav me-auto mb-2 mb-md-0">
-          <li class="nav-item"><a class="nav-link map-link" data-map="route" href="#">Route Speed</a></li>
-          <li class="nav-item"><a class="nav-link map-link" data-map="centrality" href="#">Centrality Analysis</a></li>
-          <li class="nav-item"><a class="nav-link map-link" data-map="bivariate" href="#">Bivariate Gap Analysis</a></li>
-          <li class="nav-item"><a class="nav-link map-link" data-map="communities" href="#">Communities Analysis</a></li>
-          <li class="nav-item"><a class="nav-link map-link" data-map="density" href="#">Stop Density Analysis</a></li>
-        </ul>
-        <form class="d-flex">
-          <select id="mapSelect" class="form-select form-select-sm">
-            <option value="route">Route Speed</option>
-            <option value="centrality">Centrality Analysis</option>
-            <option value="bivariate">Gap Analysis</option>
-            <option value="communities">Communities Analysis</option>
-            <option value="density">Stop Density Analysis</option>
-          </select>
-        </form>
-      </div>
-    </div>
+```
+  <div class="collapse navbar-collapse" id="mapNav">
+    <ul class="navbar-nav me-auto mb-2 mb-md-0">
+      <li class="nav-item"><a class="nav-link map-link" data-map="route" href="#">Route Speed</a></li>
+      <li class="nav-item"><a class="nav-link map-link" data-map="bivariate" href="#">Gap Analysis</a></li>
+      <li class="nav-item"><a class="nav-link map-link" data-map="communities" href="#">Communities Analysis</a></li>
+      <li class="nav-item"><a class="nav-link map-link" data-map="centrality" href="#">Centrality Analysis</a></li>
+      <li class="nav-item"><a class="nav-link map-link" data-map="density" href="#">Stop Density Analysis</a></li>
+    </ul>
+    <form class="d-flex">
+      <select id="mapSelect" class="form-select form-select-sm">
+        <option value="route">Route Speed</option>
+        <option value="bivariate">Gap Analysis</option>
+        <option value="communities">Communities Analysis</option>
+        <option value="centrality">Centrality Analysis</option>
+        <option value="density">Stop Density Analysis</option>
+      </select>
+    </form>
+  </div>
+</div>
+```
+
   </nav>
 
   <div class="map-wrap">
     <iframe id="frame-route" class="map-frame" src="transjakarta_route_speed_map.html" title="Route speed"></iframe>
-    <iframe id="frame-centrality" class="map-frame" src="transjakarta_enhanced_centrality_map.html" title="Enhanced centrality"></iframe>
     <iframe id="frame-bivariate" class="map-frame" src="transjakarta_bivariate_gap_map_v2.html" title="Bivariate gap"></iframe>
     <iframe id="frame-communities" class="map-frame" src="transjakarta_communities_map.html" title="Communities"></iframe>
+    <iframe id="frame-centrality" class="map-frame" src="transjakarta_enhanced_centrality_map.html" title="Enhanced centrality"></iframe>
     <iframe id="frame-density" class="map-frame" src="transjakarta_stop_density_map.html" title="Stop density"></iframe>
+  </div>
+
+  <div class="container my-3">
+    <div id="insight-route" class="card insight-card">
+      <div class="card-body">
+        <h5 class="card-title">Route Speed Insights</h5>
+        <p class="card-text">This map shows variations in bus travel speed across routes. Slower segments often correspond to congestion hotspots, highlighting where service reliability may be at risk.</p>
+      </div>
+    </div>
+    <div id="insight-bivariate" class="card insight-card">
+      <div class="card-body">
+        <h5 class="card-title">Gap Analysis Insights</h5>
+        <p class="card-text">This analysis compares service frequency with population distribution. Areas with high population but low service highlight coverage gaps where accessibility improvements are needed.</p>
+      </div>
+    </div>
+    <div id="insight-communities" class="card insight-card">
+      <div class="card-body">
+        <h5 class="card-title">Communities Analysis Insights</h5>
+        <p class="card-text">Community detection reveals clusters of stops that form natural service groups. Bridge routes between communities play a critical role in connecting different parts of the network.</p>
+      </div>
+    </div>
+    <div id="insight-centrality" class="card insight-card">
+      <div class="card-body">
+        <h5 class="card-title">Centrality Analysis Insights</h5>
+        <p class="card-text">Centrality highlights the most connected and influential stops. Key “hub” stops have many direct connections, while “bridge” stops are vital for linking otherwise separate areas.</p>
+      </div>
+    </div>
+    <div id="insight-density" class="card insight-card">
+      <div class="card-body">
+        <h5 class="card-title">Stop Density Insights</h5>
+        <p class="card-text">This map shows how densely stops are distributed across Jakarta. High-density areas indicate strong coverage, while low-density areas may face accessibility challenges.</p>
+      </div>
+    </div>
   </div>
 
   <script>
     const mapToFrame = {
       'route': 'frame-route',
-      'centrality': 'frame-centrality',
       'bivariate': 'frame-bivariate',
       'communities': 'frame-communities',
+      'centrality': 'frame-centrality',
       'density': 'frame-density'
+    };
+
+    const mapToInsight = {
+      'route': 'insight-route',
+      'bivariate': 'insight-bivariate',
+      'communities': 'insight-communities',
+      'centrality': 'insight-centrality',
+      'density': 'insight-density'
     };
 
     let current = 'route';
 
     function showMap(name) {
       Object.keys(mapToFrame).forEach(k => {
-        const el = document.getElementById(mapToFrame[k]);
-        if (!el) return;
-        el.classList.toggle('active', k === name);
+        const frame = document.getElementById(mapToFrame[k]);
+        const insight = document.getElementById(mapToInsight[k]);
+        if (frame) frame.classList.toggle('active', k === name);
+        if (insight) insight.classList.toggle('active', k === name);
       });
       document.getElementById('mapSelect').value = name;
       document.querySelectorAll('.map-link').forEach(link => {
@@ -116,7 +167,6 @@
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
-
-
