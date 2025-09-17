@@ -1,188 +1,192 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Transjakarta GTFS Analysis</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Transjakarta GTFS Analysis</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  
-  <style>
-    :root {
-      --header-bg: #232931;
-      --insight-bg: #FFFFFF;
-      --accent-color: #4ecca3;
-      --text-light: #eeeeee;
-      --text-dark: #393e46;
-      --bg-active: #4ecca3;
-      --text-active: #232931;
-    }
-    html, body {
-      height: 100%; margin: 0; font-family: 'Poppins', sans-serif;
-      background-color: #f0f2f5; overflow: hidden;
-    }
-    body { display: flex; flex-direction: column; }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --header-bg: #232931;
+      --insight-bg: #FFFFFF;
+      --accent-color: #4ecca3;
+      --text-light: #eeeeee;
+      --text-dark: #393e46;
+      --bg-active: #4ecca3;
+      --text-active: #232931;
+    }
+    html, body {
+      height: 100%; margin: 0; font-family: 'Poppins', sans-serif;
+      background-color: #f0f2f5; overflow: hidden;
+    }
+    body { display: flex; flex-direction: column; }
 
-    header {
-      background-color: var(--header-bg); padding: 10px 20px;
-      color: var(--text-light); display: flex;
-      justify-content: space-between; align-items: center;
-      flex-shrink: 0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      position: relative; 
-      z-index: 1001; 
-    }
-    header h1 { font-size: 1.2rem; margin: 0; }
-    .nav-links {
-      display: flex;
-      gap: 5px;
-    }
-    .nav-links a {
-      color: var(--text-light); text-decoration: none;
-      padding: 8px 12px; border-radius: 6px;
-      font-size: 0.9rem; transition: background-color 0.2s ease;
-      white-space: nowrap;
-    }
-    .nav-links a:hover { background-color: rgba(255, 255, 255, 0.1); }
-    .nav-links a.active {
-      background-color: var(--bg-active);
-      color: var(--text-active); font-weight: 600;
-    }
-    .menu-toggle { display: none; }
+    header {
+      background-color: var(--header-bg); padding: 10px 20px;
+      color: var(--text-light); display: flex;
+      justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      position: relative; 
+      z-index: 1001; 
+    }
+    header h1 { font-size: 1.2rem; margin: 0; }
+    .nav-links {
+      display: flex;
+      gap: 5px;
+    }
+    .nav-links a {
+      color: var(--text-light); text-decoration: none;
+      padding: 8px 12px; border-radius: 6px;
+      font-size: 0.9rem; transition: background-color 0.2s ease;
+      white-space: nowrap;
+    }
+    .nav-links a:hover { background-color: rgba(255, 255, 255, 0.1); }
+    .nav-links a.active {
+      background-color: var(--bg-active);
+      color: var(--text-active); font-weight: 600;
+    }
+    .menu-toggle { display: none; }
 
-    main { flex-grow: 1; position: relative; }
-    .map-container {
-      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
-    }
-    .map-container.active { opacity: 1; visibility: visible; }
-    iframe { width: 100%; height: 100%; border: none; }
+    main { flex-grow: 1; position: relative; }
+    .map-container {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
+    }
+    .map-container.active { opacity: 1; visibility: visible; }
+    iframe { width: 100%; height: 100%; border: none; }
 
-    .insight-bar {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background-color: var(--insight-bg); color: var(--text-dark);
-      padding: 15px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-      z-index: 1000; max-height: 25vh; overflow-y: auto;
-    }
-    .insight-content {
-      display: none; font-size: 0.85rem; line-height: 1.5;
-    }
-    .insight-content.active { display: block; }
-    .insight-content p { margin: 0 0 5px 0; }
-    .insight-content strong { color: #000; }
-    
-    @media (max-width: 768px) {
-      .menu-toggle {
-        display: block;
-        background: none; border: none;
-        cursor: pointer; padding: 5px;
-        display: flex; flex-direction: column;
-        gap: 5px;
-      }
-      .menu-toggle span {
-        display: block;
-        width: 25px; height: 3px;
-        background-color: var(--text-light);
-        border-radius: 3px;
-      }
-      .nav-links { display: none; }
-      .nav-links.is-open {
-        display: flex;
-        flex-direction: column; 
-        gap: 10px;
-        position: absolute;
-        top: 100%; 
-        left: 0;
-        right: 0;
-        background-color: var(--header-bg);
-        padding: 15px;
-        box-shadow: 0 4px 5px rgba(0,0,0,0.2);
-      }
-      .nav-links.is-open a {
-        width: 100%;
-        text-align: center;
-      }
-    }
-  </style>
+    .insight-bar {
+      /* MODIFIED: Removed fixed positioning to make it part of the document flow */
+      background-color: var(--insight-bg);
+      color: var(--text-dark);
+      padding: 15px 20px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      max-height: 25vh;
+      overflow-y: auto;
+      flex-shrink: 0; /* ADDED: Prevents the bar from shrinking */
+    }
+    .insight-content {
+      display: none; font-size: 0.85rem; line-height: 1.5;
+    }
+    .insight-content.active { display: block; }
+    .insight-content p { margin: 0 0 5px 0; }
+    .insight-content strong { color: #000; }
+    
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+        background: none; border: none;
+        cursor: pointer; padding: 5px;
+        display: flex; flex-direction: column;
+        gap: 5px;
+      }
+      .menu-toggle span {
+        display: block;
+        width: 25px; height: 3px;
+        background-color: var(--text-light);
+        border-radius: 3px;
+      }
+      .nav-links { display: none; }
+      .nav-links.is-open {
+        display: flex;
+        flex-direction: column; 
+        gap: 10px;
+        position: absolute;
+        top: 100%; 
+        left: 0;
+        right: 0;
+        background-color: var(--header-bg);
+        padding: 15px;
+        box-shadow: 0 4px 5px rgba(0,0,0,0.2);
+      }
+      .nav-links.is-open a {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
 
-  <header>
-    <h1>Transjakarta Analysis</h1>
-    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-    <nav class="nav-links" id="nav-menu">
-      <a href="#" class="nav-link" data-map="density">Stop Density</a>
-      <a href="#" class="nav-link" data-map="route">Route Speed</a>
-      <a href="#" class="nav-link" data-map="communities">Communities</a>
-      <a href="#" class="nav-link" data-map="centrality">Centrality</a>
-      <a href="#" class="nav-link" data-map="bivariate">Gap Analysis</a>
-    </nav>
-  </header>
+  <header>
+    <h1>Transjakarta Analysis</h1>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav class="nav-links" id="nav-menu">
+      <a href="#" class="nav-link" data-map="density">Stop Density</a>
+      <a href="#" class="nav-link" data-map="route">Route Speed</a>
+      <a href="#" class="nav-link" data-map="communities">Communities</a>
+      <a href="#" class="nav-link" data-map="centrality">Centrality</a>
+      <a href="#" class="nav-link" data-map="bivariate">Gap Analysis</a>
+    </nav>
+  </header>
 
-  <main>
-    <div id="container-density" class="map-container"><iframe src="transjakarta_stop_density_map.html" title="Stop Density"></iframe></div>
-    <div id="container-route" class="map-container"><iframe src="transjakarta_route_speed_map.html" title="Route Speed"></iframe></div>
-    <div id="container-communities" class="map-container"><iframe src="transjakarta_communities_map.html" title="Communities"></iframe></div>
-    <div id="container-centrality" class="map-container"><iframe src="transjakarta_enhanced_centrality_map.html" title="Centrality"></iframe></div>
-    <div id="container-bivariate" class="map-container"><iframe src="transjakarta_bivariate_gap_map_v2.html" title="Bivariate Gap Analysis"></iframe></div>
-  </main>
+  <main>
+    <div id="container-density" class="map-container"><iframe src="transjakarta_stop_density_map.html" title="Stop Density"></iframe></div>
+    <div id="container-route" class="map-container"><iframe src="transjakarta_route_speed_map.html" title="Route Speed"></iframe></div>
+    <div id="container-communities" class="map-container"><iframe src="transjakarta_communities_map.html" title="Communities"></iframe></div>
+    <div id="container-centrality" class="map-container"><iframe src="transjakarta_enhanced_centrality_map.html" title="Centrality"></iframe></div>
+    <div id="container-bivariate" class="map-container"><iframe src="transjakarta_bivariate_gap_map_v2.html" title="Bivariate Gap Analysis"></iframe></div>
+  </main>
 
-  <div class="insight-bar">
-    <div class="insight-content" data-map="density"><p><strong>Stop Density Analysis:</strong> This heatmap shows stop concentrations. Brighter areas mean higher stop density and better transit access.</p></div>
-    <div class="insight-content" data-map="route"><p><strong>Route Speed Analysis:</strong> Displays average route speeds. <strong>Yellow = Slower, Red = Faster</strong>. This helps identify traffic congestion points.</p></div>
-    <div class="insight-content" data-map="communities"><p><strong>Network Communities Analysis:</strong> Reveals the network's structure by identifying <strong>752 distinct clusters</strong> (communities) of connected stops. It also highlights "bridge routes" that link these communities, like Route 3 (Kalideres - Monas).</p></div>
-    <div class="insight-content" data-map="centrality"><p><strong>Network Centrality Analysis:</strong> Identifies influential stops. <strong>Bridges (Blue)</strong>, like <strong>Simpang Danau Sunter Selatan</strong>, connect network parts. <strong>Hubs (Orange)</strong>, like <strong>Cibubur Junction</strong>, have the most direct connections.</p></div>
-    <div class="insight-content" data-map="bivariate"><p><strong>Bivariate Transit Gap Analysis:</strong> This compares service with population. <strong>Red = Low Service, Blue = High Service</strong>. Brightness shows population. <strong>Bright red areas are critical service gaps</strong> (high population, poor transit) for prioritization.</p></div>
-  </div>
+  <div class="insight-bar">
+    <div class="insight-content" data-map="density"><p><strong>Stop Density Analysis:</strong> This heatmap shows stop concentrations. Brighter areas mean higher stop density and better transit access.</p></div>
+    <div class="insight-content" data-map="route"><p><strong>Route Speed Analysis:</strong> Displays average route speeds. <strong>Yellow = Slower, Red = Faster</strong>. This helps identify traffic congestion points.</p></div>
+    <div class="insight-content" data-map="communities"><p><strong>Network Communities Analysis:</strong> Reveals the network's structure by identifying <strong>752 distinct clusters</strong> (communities) of connected stops. It also highlights "bridge routes" that link these communities, like Route 3 (Kalideres - Monas).</p></div>
+    <div class="insight-content" data-map="centrality"><p><strong>Network Centrality Analysis:</strong> Identifies influential stops. <strong>Bridges (Blue)</strong>, like <strong>Simpang Danau Sunter Selatan</strong>, connect network parts. <strong>Hubs (Orange)</strong>, like <strong>Cibubur Junction</strong>, have the most direct connections.</p></div>
+    <div class="insight-content" data-map="bivariate"><p><strong>Bivariate Transit Gap Analysis:</strong> This compares service with population. <strong>Red = Low Service, Blue = High Service</strong>. Brightness shows population. <strong>Bright red areas are critical service gaps</strong> (high population, poor transit) for prioritization.</p></div>
+  </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const navLinks = document.querySelectorAll('.nav-link');
-      const mapContainers = document.querySelectorAll('.map-container');
-      const insightContents = document.querySelectorAll('.insight-content');
-      const menuToggle = document.getElementById('menu-toggle');
-      const navMenu = document.getElementById('nav-menu');
-      const isMobile = () => window.innerWidth <= 768;
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const mapContainers = document.querySelectorAll('.map-container');
+      const insightContents = document.querySelectorAll('.insight-content');
+      const menuToggle = document.getElementById('menu-toggle');
+      const navMenu = document.getElementById('nav-menu');
+      const isMobile = () => window.innerWidth <= 768;
 
-      function switchView(mapName) {
-        navLinks.forEach(link => link.classList.remove('active'));
-        mapContainers.forEach(container => container.classList.remove('active'));
-        insightContents.forEach(content => content.classList.remove('active'));
+      function switchView(mapName) {
+        navLinks.forEach(link => link.classList.remove('active'));
+        mapContainers.forEach(container => container.classList.remove('active'));
+        insightContents.forEach(content => content.classList.remove('active'));
 
-        const activeLink = document.querySelector(`.nav-link[data-map="${mapName}"]`);
-        const activeMapContainer = document.getElementById(`container-${mapName}`);
-        const activeInsightContent = document.querySelector(`.insight-content[data-map="${mapName}"]`);
+        const activeLink = document.querySelector(`.nav-link[data-map="${mapName}"]`);
+        const activeMapContainer = document.getElementById(`container-${mapName}`);
+        const activeInsightContent = document.querySelector(`.insight-content[data-map="${mapName}"]`);
 
-        if (activeLink) activeLink.classList.add('active');
-        if (activeMapContainer) activeMapContainer.classList.add('active');
-        if (activeInsightContent) activeInsightContent.classList.add('active');
-      }
+        if (activeLink) activeLink.classList.add('active');
+        if (activeMapContainer) activeMapContainer.classList.add('active');
+        if (activeInsightContent) activeInsightContent.classList.add('active');
+      }
 
-      menuToggle.addEventListener('click', () => {
-        navMenu.classList.toggle('is-open');
-      });
+      menuToggle.addEventListener('click', () => {
+        navMenu.classList.toggle('is-open');
+      });
 
-      navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const mapName = link.getAttribute('data-map');
-          switchView(mapName);
-          
-          if (isMobile() && navMenu.classList.contains('is-open')) {
-            navMenu.classList.remove('is-open');
-          }
-        });
-      });
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const mapName = link.getAttribute('data-map');
+          switchView(mapName);
+          
+          if (isMobile() && navMenu.classList.contains('is-open')) {
+            navMenu.classList.remove('is-open');
+          }
+        });
+      });
 
-      switchView('density'); 
-    });
-  </script>
+      switchView('density'); 
+    });
+  </script>
 
 </body>
 </html>
