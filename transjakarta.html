@@ -21,42 +21,24 @@
       --sidebar-width: 280px;
       --mobile-header-height: 56px;
     }
-
     html, body {
-      height: 100%;
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background-color: var(--map-bg);
-      overflow: hidden;
+      height: 100%; margin: 0; font-family: 'Poppins', sans-serif;
+      background-color: var(--map-bg); overflow: hidden;
     }
-
     body { display: flex; }
-
     .sidebar {
-      width: var(--sidebar-width);
-      flex-shrink: 0;
-      background-color: var(--sidebar-bg);
-      color: var(--text-light);
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-      z-index: 1002;
+      width: var(--sidebar-width); flex-shrink: 0; background-color: var(--sidebar-bg);
+      color: var(--text-light); display: flex; flex-direction: column; padding: 20px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 1002;
       transition: transform 0.3s ease-in-out;
     }
     .sidebar-header { text-align: center; border-bottom: 1px solid var(--border-color); padding: 10px 0; margin-bottom: 20px; }
     .sidebar-header h4 { margin: 0; font-weight: 600; }
     .sidebar-header i { font-size: 2rem; color: var(--accent-color); margin-bottom: 10px; }
-
     .nav-pills .nav-link {
-      color: var(--text-light);
-      margin-bottom: 8px;
-      border-radius: 8px;
+      color: var(--text-light); margin-bottom: 8px; border-radius: 8px;
       transition: background-color 0.2s ease, color 0.2s ease;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      padding: 12px 15px;
+      font-weight: 500; display: flex; align-items: center; padding: 12px 15px;
     }
     .nav-pills .nav-link i { margin-right: 15px; font-size: 1.2rem; width: 20px; text-align: center; }
     .nav-pills .nav-link:hover { background-color: var(--border-color); }
@@ -64,138 +46,91 @@
     
     .mobile-header { display: none; }
     .main-content { position: relative; flex-grow: 1; height: 100vh; }
-
     .map-container {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.3s ease;
+      opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
     }
     .map-container.active { opacity: 1; visibility: visible; }
     iframe.map-frame { width: 100%; height: 100%; border: 0; }
 
     .insight-box {
-      position: absolute;
-      bottom: 20px; left: 20px; z-index: 1000;
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px; padding: 15px 20px;
-      width: 380px; max-width: calc(100% - 40px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      color: var(--text-dark);
-      overflow: hidden;
+      position: absolute; bottom: 20px; left: 20px; z-index: 1000;
+      background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px; padding: 15px 20px; width: 380px; max-width: calc(100% - 40px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1); color: var(--text-dark);
     }
     .insight-box__header {
-      font-size: 18px;
-      font-weight: 600;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
+      font-size: 18px; font-weight: 600; margin: 0;
+      display: flex; align-items: center; cursor: pointer;
     }
-      .insight-box__header i { margin-right: 12px; color: var(--accent-color); }
-      .insight-box__toggle-icon { margin-left: auto; transition: transform 0.3s ease; }
-
+    .insight-box__header i { margin-right: 12px; color: var(--accent-color); }
+    .insight-box__toggle-icon { margin-left: auto; transition: transform 0.3s ease; }
     .insight-box__content {
-      padding-top: 12px;
-      margin-top: 12px;
-      border-top: 1px solid rgba(0,0,0,0.1);
-      font-size: 14px;
-      line-height: 1.6;
+      padding-top: 12px; margin-top: 12px; border-top: 1px solid rgba(0,0,0,0.1);
+      font-size: 14px; line-height: 1.6;
       transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out, margin-top 0.4s ease, padding-top 0.4s ease;
-      max-height: 500px;
-      opacity: 1;
+      max-height: 500px; opacity: 1;
     }
-    .insight-box p { margin-bottom: 10px; }
-    .insight-box ul { padding-left: 20px; margin: 5px 0 0 0; }
-    .insight-box strong { color: #000; }
-    
     .insight-box.is-collapsed .insight-box__content {
-        max-height: 0;
-        opacity: 0;
-        margin-top: 0;
-        padding-top: 0;
-        border-top: none;
+      max-height: 0; opacity: 0; margin-top: 0;
+      padding-top: 0; border-top: none;
     }
-    .insight-box.is-collapsed .insight-box__toggle-icon {
-        transform: rotate(-90deg);
-    }
-
+    .insight-box.is-collapsed .insight-box__toggle-icon { transform: rotate(-90deg); }
     .insight-box.top-right { bottom: auto; left: auto; top: 20px; right: 20px; }
     
     .sidebar-overlay {
-        display: none;
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 1001;
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5); z-index: 1001;
     }
 
+    /* --- MOBILE STYLES --- */
     @media (max-width: 992px) {
-      .sidebar {
-        position: fixed;
-        transform: translateX(-100%);
-      }
+      .sidebar { position: fixed; transform: translateX(-100%); }
       .sidebar.is-open { transform: translateX(0); }
       .sidebar-overlay.is-active { display: block; }
       
-      /* --- CHANGED: Mobile Header --- */
       .mobile-header {
-        display: flex; 
-        justify-content: space-between; /* NEW */
-        align-items: center;
-        position: fixed; 
-        top: 10px; left: 10px;
-        width: calc(100% - 20px);
-        height: var(--mobile-header-height);
-        padding: 0 15px;
-        background: rgba(35, 41, 49, 0.85);
-        color: var(--text-light);
+        display: flex; justify-content: space-between; align-items: center;
+        position: fixed; top: 10px; left: 10px;
+        width: calc(100% - 20px); height: var(--mobile-header-height); padding: 0 15px;
+        background: rgba(35, 41, 49, 0.85); color: var(--text-light);
         backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        z-index: 1000;
-        box-sizing: border-box;
-        border-radius: 12px;
+        z-index: 1001; box-sizing: border-box; border-radius: 12px;
       }
-      .menu-toggle, .info-toggle { /* CHANGED */
+      .mobile-title-container { display: flex; align-items: center; }
+      .menu-toggle, .info-toggle {
         background: none; border: none; color: var(--text-light);
-        font-size: 1.5rem;
-        padding: 5px;
-        cursor: pointer;
+        font-size: 1.5rem; padding: 5px; cursor: pointer;
       }
-      .mobile-title-container { /* NEW */
-        display: flex;
-        align-items: center;
-      }
-      .mobile-title-container .menu-toggle {
-        margin-right: 15px;
-      }
+      .menu-toggle { margin-right: 15px; }
       .mobile-title { font-size: 1.1rem; font-weight: 500; }
-
-      .main-content {
-        width: 100%;
-        height: 100vh;
-      }
+      .main-content { width: 100%; height: 100vh; }
       
-      /* --- CHANGED: Mobile Insight Box for "Bottom Sheet" effect --- */
+      /* --- SIMPLIFIED Mobile Insight Box --- */
       .insight-box {
         position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        max-width: 100%; /* Override desktop style */
-        border-radius: 20px 20px 0 0; /* Rounded top corners */
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-        transform: translateY(100%); /* Start hidden below the viewport */
-        transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        padding-bottom: 25px;
+        bottom: 10px; left: 10px; right: 10px;
+        width: auto; /* Let positioning handle the width */
+        max-width: none;
+        z-index: 1000;
+        background: white; /* Solid background for clarity */
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        border-radius: 12px;
+        max-height: 45vh; /* Prevent it from covering too much screen */
+        overflow-y: auto; /* Allow scrolling for content */
+        
+        /* Hide by default on mobile */
+        display: none;
       }
-      /* NEW class to control visibility */
+      /* This class will be toggled by JS to show the box */
       .insight-box.is-visible {
-        transform: translateY(0);
+        display: block;
       }
-      .insight-box.top-right { /* Reposition the top-right one to also come from bottom */
-        top: auto; right: 0; left: 0;
+      .insight-box.top-right {
+        top: auto; /* Override desktop style */
+        bottom: 10px;
       }
     }
   </style>
@@ -226,9 +161,7 @@
       <iframe class="map-frame" src="transjakarta_stop_density_map.html" title="Stop density"></iframe>
       <div class="insight-box">
         <h5 class="insight-box__header"><i class="bi bi-info-circle-fill"></i>Stop Density Analysis<i class="bi bi-chevron-down insight-box__toggle-icon"></i></h5>
-        <div class="insight-box__content">
-          <p>This heatmap shows stop concentrations. Brighter areas mean higher stop density and better transit access.</p>
-        </div>
+        <div class="insight-box__content"><p>This heatmap shows stop concentrations. Brighter areas mean higher stop density and better transit access.</p></div>
       </div>
     </div>
 
@@ -236,9 +169,7 @@
       <iframe class="map-frame" src="transjakarta_route_speed_map.html" title="Route speed"></iframe>
       <div class="insight-box">
         <h5 class="insight-box__header"><i class="bi bi-info-circle-fill"></i>Route Speed Analysis<i class="bi bi-chevron-down insight-box__toggle-icon"></i></h5>
-        <div class="insight-box__content">
-          <p>Displays average route speeds. <strong>Yellow = Slower, Red = Faster</strong>. This helps identify traffic congestion points.</p>
-        </div>
+        <div class="insight-box__content"><p>Displays average route speeds. <strong>Yellow = Slower, Red = Faster</strong>. This helps identify traffic congestion points.</p></div>
       </div>
     </div>
 
@@ -246,9 +177,7 @@
       <iframe class="map-frame" src="transjakarta_communities_map.html" title="Communities"></iframe>
       <div class="insight-box">
         <h5 class="insight-box__header"><i class="bi bi-info-circle-fill"></i>Network Communities Analysis<i class="bi bi-chevron-down insight-box__toggle-icon"></i></h5>
-        <div class="insight-box__content">
-          <p>Reveals the network's structure by identifying <strong>752 distinct clusters</strong> (communities) of connected stops. It also highlights "bridge routes" that link these communities, like Route 3 (Kalideres - Monas).</p>
-        </div>
+        <div class="insight-box__content"><p>Reveals the network's structure by identifying <strong>752 distinct clusters</strong> (communities) of connected stops. It also highlights "bridge routes" that link these communities, like Route 3 (Kalideres - Monas).</p></div>
       </div>
     </div>
 
@@ -256,9 +185,7 @@
       <iframe class="map-frame" src="transjakarta_enhanced_centrality_map.html" title="Enhanced centrality"></iframe>
       <div class="insight-box">
         <h5 class="insight-box__header"><i class="bi bi-info-circle-fill"></i>Network Centrality Analysis<i class="bi bi-chevron-down insight-box__toggle-icon"></i></h5>
-        <div class="insight-box__content">
-          <p>Identifies influential stops. <strong>Bridges (Blue)</strong>, like <strong>Simpang Danau Sunter Selatan</strong>, connect network parts. <strong>Hubs (Orange)</strong>, like <strong>Cibubur Junction</strong>, have the most direct connections.</p>
-        </div>
+        <div class="insight-box__content"><p>Identifies influential stops. <strong>Bridges (Blue)</strong>, like <strong>Simpang Danau Sunter Selatan</strong>, connect network parts. <strong>Hubs (Orange)</strong>, like <strong>Cibubur Junction</strong>, have the most direct connections.</p></div>
       </div>
     </div>
 
@@ -266,9 +193,7 @@
       <iframe class="map-frame" src="transjakarta_bivariate_gap_map_v2.html" title="Bivariate gap"></iframe>
       <div class="insight-box top-right">
         <h5 class="insight-box__header"><i class="bi bi-info-circle-fill"></i>Bivariate Transit Gap Analysis<i class="bi bi-chevron-down insight-box__toggle-icon"></i></h5>
-        <div class="insight-box__content">
-          <p>This compares service with population. <strong>Red = Low Service, Blue = High Service</strong>. Brightness shows population. <strong>Bright red areas are critical service gaps</strong> (high population, poor transit) for prioritization.</p>
-        </div>
+        <div class="insight-box__content"><p>This compares service with population. <strong>Red = Low Service, Blue = High Service</strong>. Brightness shows population. <strong>Bright red areas are critical service gaps</strong> (high population, poor transit) for prioritization.</p></div>
       </div>
     </div>
   </main>
@@ -277,37 +202,32 @@
 
   <script>
     const mapToContainer = {
-      'density': 'container-density',
-      'route': 'container-route',
-      'communities': 'container-communities',
-      'centrality': 'container-centrality',
+      'density': 'container-density', 'route': 'container-route',
+      'communities': 'container-communities', 'centrality': 'container-centrality',
       'bivariate': 'container-bivariate'
     };
-
     let current = 'density';
     const sidebar = document.getElementById('sidebar');
     const menuToggle = document.getElementById('menu-toggle');
     const mobileTitle = document.getElementById('mobile-title');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-    const infoToggle = document.getElementById('info-toggle'); // NEW
+    const infoToggle = document.getElementById('info-toggle');
     const isMobile = () => window.innerWidth <= 992;
 
     function showMap(name, linkElement) {
-        // CHANGED: Hide any visible insight box before switching
-        if (isMobile()) {
-            const currentActiveBox = document.querySelector('.map-container.active .insight-box');
-            if (currentActiveBox) {
-                currentActiveBox.classList.remove('is-visible');
+        // --- SIMPLIFIED: Hide any open insight box before switching maps ---
+        if(isMobile()) {
+            const visibleBox = document.querySelector('.insight-box.is-visible');
+            if (visibleBox) {
+                visibleBox.classList.remove('is-visible');
             }
         }
 
         Object.keys(mapToContainer).forEach(k => {
             document.getElementById(mapToContainer[k]).classList.toggle('active', k === name);
         });
-      
         document.querySelectorAll('.map-link').forEach(link => link.classList.remove('active'));
         linkElement.classList.add('active');
-
         if (mobileTitle) {
             mobileTitle.textContent = linkElement.dataset.title || 'Analysis';
         }
@@ -342,14 +262,11 @@
         });
     });
 
-    // --- NEW: Event Listener for the mobile info toggle button ---
+    // --- SIMPLIFIED: Event Listener for the mobile info toggle button ---
     infoToggle.addEventListener('click', () => {
-        const activeContainer = document.querySelector('.map-container.active');
-        if (activeContainer) {
-            const activeInsightBox = activeContainer.querySelector('.insight-box');
-            if (activeInsightBox) {
-                activeInsightBox.classList.toggle('is-visible');
-            }
+        const activeInsightBox = document.querySelector('.map-container.active .insight-box');
+        if (activeInsightBox) {
+            activeInsightBox.classList.toggle('is-visible');
         }
     });
 
@@ -357,7 +274,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       const activeLink = document.querySelector(`.map-link[data-map="${current}"]`);
       showMap(current, activeLink);
-
+      // On mobile, all boxes start collapsed for when they are eventually shown.
       if (isMobile()) {
         document.querySelectorAll('.insight-box').forEach(box => {
             box.classList.add('is-collapsed');
