@@ -93,8 +93,8 @@
       align-items: center;
       cursor: pointer;
     }
-     .insight-box__header i { margin-right: 12px; color: var(--accent-color); }
-     .insight-box__toggle-icon { margin-left: auto; transition: transform 0.3s ease; }
+      .insight-box__header i { margin-right: 12px; color: var(--accent-color); }
+      .insight-box__toggle-icon { margin-left: auto; transition: transform 0.3s ease; }
 
     .insight-box__content {
       padding-top: 12px;
@@ -138,8 +138,11 @@
       .sidebar.is-open { transform: translateX(0); }
       .sidebar-overlay.is-active { display: block; }
       
+      /* --- CHANGED: Mobile Header --- */
       .mobile-header {
-        display: flex; align-items: center;
+        display: flex; 
+        justify-content: space-between; /* NEW */
+        align-items: center;
         position: fixed; 
         top: 10px; left: 10px;
         width: calc(100% - 20px);
@@ -153,10 +156,18 @@
         box-sizing: border-box;
         border-radius: 12px;
       }
-      .menu-toggle {
+      .menu-toggle, .info-toggle { /* CHANGED */
         background: none; border: none; color: var(--text-light);
-        font-size: 1.5rem; margin-right: 15px;
-        padding: 0;
+        font-size: 1.5rem;
+        padding: 5px;
+        cursor: pointer;
+      }
+      .mobile-title-container { /* NEW */
+        display: flex;
+        align-items: center;
+      }
+      .mobile-title-container .menu-toggle {
+        margin-right: 15px;
       }
       .mobile-title { font-size: 1.1rem; font-weight: 500; }
 
@@ -165,15 +176,26 @@
         height: 100vh;
       }
       
+      /* --- CHANGED: Mobile Insight Box for "Bottom Sheet" effect --- */
       .insight-box {
-        bottom: 15px;
-        left: 10px;
-        right: 10px;
-        width: auto;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: 100%; /* Override desktop style */
+        border-radius: 20px 20px 0 0; /* Rounded top corners */
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+        transform: translateY(100%); /* Start hidden below the viewport */
+        transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        padding-bottom: 25px;
       }
-      .insight-box.top-right {
-        bottom: auto;
-        top: calc(var(--mobile-header-height) + 20px);
+      /* NEW class to control visibility */
+      .insight-box.is-visible {
+        transform: translateY(0);
+      }
+      .insight-box.top-right { /* Reposition the top-right one to also come from bottom */
+        top: auto; right: 0; left: 0;
       }
     }
   </style>
@@ -192,8 +214,11 @@
   </div>
   
   <div class="mobile-header" id="mobile-header">
-    <button class="menu-toggle" id="menu-toggle"><i class="bi bi-list"></i></button>
-    <div class="mobile-title" id="mobile-title"></div>
+    <div class="mobile-title-container">
+        <button class="menu-toggle" id="menu-toggle"><i class="bi bi-list"></i></button>
+        <div class="mobile-title" id="mobile-title"></div>
+    </div>
+    <button class="info-toggle" id="info-toggle"><i class="bi bi-info-circle"></i></button>
   </div>
 
   <main class="main-content" id="main-content">
@@ -264,29 +289,29 @@
     const menuToggle = document.getElementById('menu-toggle');
     const mobileTitle = document.getElementById('mobile-title');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const infoToggle = document.getElementById('info-toggle'); // NEW
     const isMobile = () => window.innerWidth <= 992;
 
     function showMap(name, linkElement) {
-      Object.keys(mapToContainer).forEach(k => {
-        document.getElementById(mapToContainer[k]).classList.toggle('active', k === name);
-      });
-      
-      document.querySelectorAll('.map-link').forEach(link => link.classList.remove('active'));
-      linkElement.classList.add('active');
-
-      if (mobileTitle) {
-        mobileTitle.textContent = linkElement.dataset.title || 'Analysis';
-      }
-      current = name;
-      
-      // On mobile, ensure the newly shown insight box is collapsed
-      if (isMobile()) {
-        const activeContainer = document.getElementById(mapToContainer[name]);
-        const activeInsightBox = activeContainer.querySelector('.insight-box');
-        if (activeInsightBox) {
-            activeInsightBox.classList.add('is-collapsed');
+        // CHANGED: Hide any visible insight box before switching
+        if (isMobile()) {
+            const currentActiveBox = document.querySelector('.map-container.active .insight-box');
+            if (currentActiveBox) {
+                currentActiveBox.classList.remove('is-visible');
+            }
         }
-      }
+
+        Object.keys(mapToContainer).forEach(k => {
+            document.getElementById(mapToContainer[k]).classList.toggle('active', k === name);
+        });
+      
+        document.querySelectorAll('.map-link').forEach(link => link.classList.remove('active'));
+        linkElement.classList.add('active');
+
+        if (mobileTitle) {
+            mobileTitle.textContent = linkElement.dataset.title || 'Analysis';
+        }
+        current = name;
     }
 
     // --- Event Listeners ---
@@ -315,6 +340,17 @@
         header.addEventListener('click', () => {
             header.parentElement.classList.toggle('is-collapsed');
         });
+    });
+
+    // --- NEW: Event Listener for the mobile info toggle button ---
+    infoToggle.addEventListener('click', () => {
+        const activeContainer = document.querySelector('.map-container.active');
+        if (activeContainer) {
+            const activeInsightBox = activeContainer.querySelector('.insight-box');
+            if (activeInsightBox) {
+                activeInsightBox.classList.toggle('is-visible');
+            }
+        }
     });
 
     // --- Initial Load ---
